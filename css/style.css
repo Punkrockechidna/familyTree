@@ -41,4 +41,15 @@
          #saveButton{
              visibility: hidden;
          }
+         a,p{
+             font-size: .7em;
+             /* text-align: center; */
+            
+         }
+         h4{
+             height: 60px;
+             /* text-align: center; */
+            /* border-color: rgb(0,0,0); Black background with opacity */
+            /* border: dashed 2px; */
+         }
  
