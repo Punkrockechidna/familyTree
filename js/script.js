@@ -1,18 +1,18 @@
 //Adds event listener to the login form
-window.onload = function () {
+window.onload = function() {
     //get profiles and index
     var profiles = getProfiles();
-    
+
     // var profileIndex = findProfile(profiles);
 
     if (location.pathname.includes("index")) {  //If signup page
         const signSub = window.document.getElementById("signUpForm");
-        signSub.addEventListener("submit", function (e) {
+        signSub.addEventListener("submit", function(e) {
             e.preventDefault();
             signUpConf(profiles);
         })
         const loginSub = window.document.getElementById("loginForm");
-        loginSub.addEventListener("submit", function (e) {
+        loginSub.addEventListener("submit", function(e) {
             e.preventDefault();
 
             loginPress();
@@ -25,20 +25,57 @@ window.onload = function () {
             var profileIndex = findProfile(profiles);
             loadProfile();
             const profSave = window.document.getElementById("profileForm");
-            profSave.addEventListener("submit", function (e) {
+            profSave.addEventListener("submit", function(e) {
                 e.preventDefault();
                 saveProfile(profiles, profileIndex);
-                
+                //Adds click event to all add member options on tree
+                Array.from("addMember").forEach(function(element) {
+                    element.addEventListener('click', myFunction());
+                });
             });
+            var addMemberClick = document.getElementsByClassName("addMember");
+            for (var i = 0; i < addMemberClick.length; i++) {
+                addMemberClick[i].addEventListener('click', newFamilyProfile, false);
+            }
+            var ownerClick = document.getElementById("me");
+            ownerClick.addEventListener('click', ownerActive, false);
         }
     }
+}
+// $('btn').click( function(e) {
+//     $('.collapse').collapse('hide');
+// });
+function ownerActive() {
+    $('.collapse').collapse('hide');
+    // alert("clicked");
+    window.sessionStorage.activeRelation = "me";
+    $(".ownerProf").attr("hidden", false);
+    loadProfile();
+    $("#profileFieldSet").attr("disabled", true);
+    $("#editButton").attr("hidden", false);
+    $("#saveButton").attr("hidden", true);
+}
+function newFamilyProfile() {
+    //sets active relation type
+    window.sessionStorage.activeRelation = $(this).parent().parent().attr('id');
+    //collapses all drop downs
+    $('.collapse').collapse('hide');
+    //Hides fields not used and shows save button    
+    document.getElementById("profileForm").reset();
+    $("#profileFieldSet").removeAttr("disabled");
+    $(".ownerProf").attr("hidden", true);
+    $("#editButton").attr("hidden", true);
+    $("#saveButton").attr("hidden", false);
+    //Shows relation at top
+    $("#memberName").text(window.sessionStorage.activeRelation);
+
 }
 //Tree page scripts
 function editProfile() {
     // document.getElementById("myProfileForm").disabled = false;
     $("#profileFieldSet").removeAttr("disabled");
-    $("#saveButton").css('visibility', "visible");
-    $("#email").attr("disabled",true);
+    $("#saveButton").attr("hidden", false);
+    $("#email").attr("disabled", true);
 }
 function saveProfile(profiles, profIndex) {
     var user = {
@@ -74,50 +111,53 @@ function getProfiles() {//Returns profiles in local storage
     return profiles;
 }
 function findProfile(profiles) { //finds index of logged in profile
-   if(profiles){
-    if (!sessionStorage.loggedIn) {
-        for (let i = 0; i < profiles.length; i++) {
-            if (profiles[i].email === document.forms["loginForm"]["logEmail"].value) {
-                sessionStorage.focusID = "00";
-                return i;
+    if (profiles) {
+        if (!sessionStorage.loggedIn) {
+            for (let i = 0; i < profiles.length; i++) {
+                if (profiles[i].email === document.forms["loginForm"]["logEmail"].value) {
+                    sessionStorage.focusID = "00";
+                    return i;
+                }
             }
         }
-    }
-    else {
-        for (let i = 0; i < profiles.length; i++) {
-            if (profiles[i].id === sessionStorage.focusID) {
+        else {
+            for (let i = 0; i < profiles.length; i++) {
+                if (profiles[i].id === sessionStorage.focusID) {
 
-                return i;
+                    return i;
+                }
             }
         }
-    }
-}else{
-    alert("No profiles exist yet, lucky you to be the first");
-    signUpPress();
+    } else {
+        alert("No profiles exist yet, lucky you to be the first");
+        signUpPress();
 
-}}
-var loadProfile = function () { //load profile currently logged in
-    var profiles = getProfiles();
-    var profileIndex = findProfile(profiles);
-    var profile = {
-        firstName: profiles[profileIndex].firstName,
-        lastName: profiles[profileIndex].lastName,
-        email: profiles[profileIndex].email,
-        dob: profiles[profileIndex].dob,
-        gender: profiles[profileIndex].gender,
-        password: profiles[profileIndex].password
-    };
- 
-    let famName = profile.firstName + " " + profile.lastName;
-    $("#memberName").text(famName);
-    $("#fName").val(profile.firstName);
-    $("#lName").val(profile.lastName);
-    $("#email").val(profile.email);
-    $("#gender").val(profile.gender);
-    $("#dOB").val(profile.dob);
-    $("#password").val(profile.password);
-    if(window.sessionStorage.focusID !== "00"){
-        $(".ownerProf").attr("hidden",true);
+    }
+}
+var loadProfile = function() { //load profile currently logged in
+    if (sessionStorage.activeRelation === "me") {
+        var profiles = getProfiles();
+        var profileIndex = findProfile(profiles);
+        var profile = {
+            firstName: profiles[profileIndex].firstName,
+            lastName: profiles[profileIndex].lastName,
+            email: profiles[profileIndex].email,
+            dob: profiles[profileIndex].dob,
+            gender: profiles[profileIndex].gender,
+            password: profiles[profileIndex].password
+        };
+
+        let famName = profile.firstName + " " + profile.lastName;
+        $("#memberName").text(famName);
+        $("#fName").val(profile.firstName);
+        $("#lName").val(profile.lastName);
+        $("#email").val(profile.email);
+        $("#gender").val(profile.gender);
+        $("#dOB").val(profile.dob);
+        $("#password").val(profile.password);
+        // if(window.sessionStorage.focusID !== "00"){
+        //     $(".ownerProf").attr("hidden",true);
+        // }
     }
 }
 // Sign Up page functions
@@ -180,7 +220,7 @@ function signUpPress() { //Hides the login section and reveals the sign up secti
     loginSect.style.visibility = "hidden";
 }
 function loginPress() {//Checks to see if already logged in,and if profile exists
-    
+
     if (profiles) {
         var profileIndex = findProfile(profiles);
         sessionStorage.email = document.forms["loginForm"]["logEmail"].value;
@@ -195,7 +235,7 @@ function loginPress() {//Checks to see if already logged in,and if profile exist
         signUpPress();
     }
 }
-var login = function (profiles) {//Checks if the username matches a known profile and password matches
+var login = function(profiles) {//Checks if the username matches a known profile and password matches
     var user = {
         email: document.forms["loginForm"]["logEmail"].value,
         password: document.forms["loginForm"]["passwordL"].value
@@ -211,3 +251,8 @@ var login = function (profiles) {//Checks if the username matches a known profil
         alert("Invalid Password");
     }
 }
+
+
+
+
+//path idea for family members     profiles.familyMember=[{parent:[{first:"lauri",last:"kaplan",dob:"10/29/1965",dod:"N?A"}]}]

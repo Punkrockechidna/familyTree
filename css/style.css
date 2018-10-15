@@ -38,9 +38,9 @@
         background-color: rgba(0,0,0,0.8); /* Black background with opacity */
         z-index: -1;
          }
-         #saveButton{
+         /* #saveButton{
              visibility: hidden;
-         }
+         } */
          a,p{
              font-size: .7em;
              /* text-align: center; */
