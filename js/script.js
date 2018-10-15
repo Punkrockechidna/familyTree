@@ -220,7 +220,7 @@ function signUpPress() { //Hides the login section and reveals the sign up secti
     loginSect.style.visibility = "hidden";
 }
 function loginPress() {//Checks to see if already logged in,and if profile exists
-
+deugger;
     if (profiles) {
         var profileIndex = findProfile(profiles);
         sessionStorage.email = document.forms["loginForm"]["logEmail"].value;
